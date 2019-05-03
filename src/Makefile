@@ -1,20 +1,25 @@
 CC = gcc
-CFLAGS = -DHAVE_CONFIG_H -I../lib -I. -DHAVE_CONFIG_H -DNO_LIBPAPER -g -O2
+CFLAGS = -DHAVE_CONFIG_H -I../lib -DHAVE_CONFIG_H -DNO_LIBPAPER -g -O2
 LDLIBS = -lbarcode
 LDLFLAGS = -L../lib
 
 
 all: barcode
 
-sample: sample.o barcode
+sample: sample.o
+	$(CC) $(CFLAGS) $(LDLFLAGS) -o $@ $^ $(LDLIBS)
 
-barcode: main.o cmdline.o
-	$(CC) $(CFLAGS) $(LDLIBS) $(LDLFLAGS) -o $@ $^ 
+barcode: cmdline.o main.o 
+	$(CC) $(CFLAGS) $(LDLFLAGS) -o $@ $^ $(LDLIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< 
 
-clean:
-	rm -f main.o cmdline.o sample barcode
+test: barcode 
+	@./barcode -b bonjour -E > test-bonjour.eps
+	@cmp bonjour.eps test-bonjour.eps || exit 1
 
-.PHONY: all clean
+clean:
+	rm -f main.o cmdline.o sample barcode test-bonjour.eps
+
+.PHONY: all clean test
