@@ -4,6 +4,7 @@ AR = ar
 ARFLAGS = cru
 RANLIB = ranlib
 SRCFILES = codabar.c code128.c code93.c i25.c msi.c plessey.c svg.c code11.c code39.c ean.c library.c pcl.c ps.c
+DESTDIR = .
 
 
 all: libbarcode.a
@@ -15,7 +16,15 @@ libbarcode.a: $(SRCFILES:.c=.o)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< 
 
+install: libbarcode.a barcode.h
+	mkdir -p $(DESTDIR)/lib && cp libbarcode.a $(DESTDIR)/lib
+	mkdir -p $(DESTDIR)/include && cp barcode.h $(DESTDIR)/include
+
+uninstall:
+	rm -f $(DESTDIR)/lib/libbarcode.a
+	rm -f $(DESTDIR)/include/barcode.h
+
 clean:
 	rm -f $(SRCFILES:.c=.o) libbarcode.a
 
-.PHONY: all clean
+.PHONY: all clean install uninstall
